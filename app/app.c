@@ -2,8 +2,6 @@
 #include "../kernel/types.h"
 #include "../kernel/etc.h"
 
-extern struct TaskTCB;
-
 struct TaskTCB task1;
 struct TaskTCB task2;
 struct TaskTCB task3;
@@ -16,9 +14,6 @@ int value4;
 
 void task_func1(void *);
 void task_func2(void *);
-void initsystem(void);
-void addtasktolist(struct TaskTCB *,TaskFUNC,void *);
-void startsystem(void);
 
 int main()
 {
