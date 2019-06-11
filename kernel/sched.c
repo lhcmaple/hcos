@@ -2,32 +2,20 @@
 #define NULL ((void *)0)
 
 struct task_pcb{
-	char *task_top;//���̶�ջ���洦
+	char *task_top;//进程堆栈保存处
 	struct task_pcb *next;
-	char stack[STACK_SIZE];//���̶�ջ
-	int pid;
-	void (*task_func)(void *);//��ʼ��������
-	void *pvalue;//��ʼ������
+	char stack[STACK_SIZE];//进程堆栈
+	int pid;//进程ID
+	void (*task_func)(void *);//初始化任务函数
+	void *pvalue;//初始化参数
 };
-
-struct task_pcb task_list;
-int taskpid;
-struct task_pcb *current;
-struct task_pcb task1;
-struct task_pcb task2;
-struct task_pcb task3;
-struct task_pcb task4;
-int value1;
-int value2;
-int value3;
-int value4;
 
 void task_func1(void *);
 void task_func2(void *);
-void initsystem();
+void initsystem(void);
 void addtasktolist(struct task_pcb *,void (*)(void *),void *);
-void startsystem();
-__asm void __startsystem();
+void startsystem(void);
+__asm void __startsystem(void);
 
 int main()
 {
@@ -40,7 +28,7 @@ int main()
 	return 0;
 }
 
-void initsystem()
+void initsystem(void)
 {
 	task_list.next=NULL;
 	taskpid=0;
@@ -67,11 +55,11 @@ void addtasktolist(struct task_pcb *taskp,void (*ptask_func)(void *),void *pvalu
 	*((int **)(taskp->task_top-8))=(int *)ptask_func;
 	*((int *)(taskp->task_top-4))=0x01000000;
 	taskp->task_top-=0x40;
-	*((void **)(taskp->task_top+0x20))=taskp->pvalue;//���ݲ���
+	*((void **)(taskp->task_top+0x20))=taskp->pvalue;//传递参数
 	//R4-R11,R0-R3,R12,R14,R15,xPSR
 }
 
-void startsystem()
+void startsystem(void)
 {
 	current=(&task_list)->next;
 	__startsystem();
@@ -93,21 +81,21 @@ void task_func2(void *pvalue)
 	}
 }
 
-__asm void __startsystem()
+__asm void __startsystem(void)
 {
 	IMPORT current
 	LDR R0,=current
 	LDR R0,[R0]
-	LDR R1,[R0];R1��ʱ����current->task_top
+	LDR R1,[R0];R1此时等于current->task_top
 
 	MOV R0,#0x02
-	MSR CONTROL,R0;����ʹ�ý��̶�ջ
+	MSR CONTROL,R0;切换堆栈
 	MOV SP,R1
 	ADD SP,#0x40
 	LDR R0,[R1,#0x20]
 	LDR LR,[R1,#0x38]
 
-;���õ���ʱ��
+;设置调度时钟
 	LDR R3,=0xE000E010
 	LDR R4,=0xE000E014
 	LDR R7,[R3]
