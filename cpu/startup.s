@@ -1,7 +1,3 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;hcos
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 	AREA RESET,DATA,READONLY
 VECTORS_START
 	DCD MSP_TOP
@@ -45,7 +41,7 @@ SYS_HANDLER PROC
 	MSR PSP,R0
  	BX LR
 	ENDP
-	NOP;¶ÔÆë×÷ÓÃ
+	NOP;ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 	AREA STACKSEG,NOINIT,READWRITE,ALIGN=3

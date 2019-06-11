@@ -1,84 +1,58 @@
-#define STACK_SIZE 0x400
-#define NULL ((void *)0)
+#include "etc.h"
+#include "types.h"
 
-struct task_pcb{
-	char *task_top;//进程堆栈保存处
-	struct task_pcb *next;
+struct TaskTCB{
+	char *stack_top;//进程堆栈保存处
+	struct TaskTCB *next;//下一任务
 	char stack[STACK_SIZE];//进程堆栈
 	int pid;//进程ID
-	void (*task_func)(void *);//初始化任务函数
+	TaskFUNC task_func;//初始化任务函数
 	void *pvalue;//初始化参数
 };
 
-void task_func1(void *);
-void task_func2(void *);
-void initsystem(void);
-void addtasktolist(struct task_pcb *,void (*)(void *),void *);
-void startsystem(void);
-__asm void __startsystem(void);
+struct TaskTCB *tasks[1];
+struct TaskTCB *current;
+struct TaskTCB idlepcb;
+int taskpid;
 
-int main()
-{
-	initsystem();
-	addtasktolist(&task1,&task_func1,&value1);
-	addtasktolist(&task2,&task_func2,&value2);
-	addtasktolist(&task3,&task_func1,&value3);
-	addtasktolist(&task4,&task_func1,&value4);
-	startsystem();
-	return 0;
-}
+void __asm __startsystem(void);
+void idletask(void *);
 
 void initsystem(void)
 {
-	task_list.next=NULL;
+	tasks[0]=NULL;
 	taskpid=0;
 }
 
-void addtasktolist(struct task_pcb *taskp,void (*ptask_func)(void *),void *pvalue)
+void addtasktolist(struct TaskTCB *taskp,TaskFUNC ptask_func,void *pvalue)
 {
-	struct task_pcb *tp;
-	tp=(&task_list)->next;
-	if(tp)
+	//R4-R11,R0-R3,R12,R14,R15,xPSR
+	taskp->stack_top=taskp->stack+STACK_SIZE;
+	*((int **)(taskp->stack_top-0x8))=(int *)ptask_func;
+	*((int *)(taskp->stack_top-0x4))=0x01000000;//xPSR的初始值
+	*((void **)(taskp->stack_top-0x20))=pvalue;//传递参数
+	taskp->stack_top-=0x40;
+	if(tasks[0])
 	{
-		taskp->next=tp->next;
-		tp->next=taskp;
+		taskp->next=tasks[0]->next;
+		tasks[0]->next=taskp;
 	}
 	else
 	{
-		(&task_list)->next=taskp;
 		taskp->next=taskp;
+		tasks[0]=taskp;
 	}
-	taskp->pvalue=pvalue;
-	taskp->pid=(++taskpid);
+	taskp->pid=(taskpid++);
 	taskp->task_func=ptask_func;
-	taskp->task_top=taskp->stack+STACK_SIZE;
-	*((int **)(taskp->task_top-8))=(int *)ptask_func;
-	*((int *)(taskp->task_top-4))=0x01000000;
-	taskp->task_top-=0x40;
-	*((void **)(taskp->task_top+0x20))=taskp->pvalue;//传递参数
-	//R4-R11,R0-R3,R12,R14,R15,xPSR
+	taskp->pvalue=pvalue;
 }
 
 void startsystem(void)
 {
-	current=(&task_list)->next;
+	current=tasks[0];
+	if(current==NULL)
+		addtasktolist(&idlepcb,idletask,NULL);
 	__startsystem();
-}
-
-void task_func1(void *pvalue)
-{
-	while(1)
-	{
-		*((int *)pvalue)+=1;
-	}
-}
-
-void task_func2(void *pvalue)
-{
-	while(1)
-	{
-		*((int *)pvalue)+=1;
-	}
 }
 
 __asm void __startsystem(void)
@@ -86,7 +60,7 @@ __asm void __startsystem(void)
 	IMPORT current
 	LDR R0,=current
 	LDR R0,[R0]
-	LDR R1,[R0];R1此时等于current->task_top
+	LDR R1,[R0];R1此时等于current->stack_top
 
 	MOV R0,#0x02
 	MSR CONTROL,R0;切换堆栈
@@ -105,4 +79,12 @@ __asm void __startsystem(void)
 	STR R7,[R4]
 
 	BX LR
+}
+
+void idletask(void *pvalue)
+{
+	while(1)
+	{
+		;//空闲任务
+	}
 }

@@ -423,6 +423,11 @@
               <FileType>5</FileType>
               <FilePath>.\kernel\etc.h</FilePath>
             </File>
+            <File>
+              <FileName>sched.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\kernel\sched.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
