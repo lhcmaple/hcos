@@ -415,7 +415,7 @@
             </File>
             <File>
               <FileName>types.h</FileName>
-              <FileType>1</FileType>
+              <FileType>5</FileType>
               <FilePath>.\kernel\types.h</FilePath>
             </File>
             <File>
@@ -427,6 +427,26 @@
               <FileName>sched.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\kernel\sched.h</FilePath>
+            </File>
+            <File>
+              <FileName>sem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\kernel\sem.c</FilePath>
+            </File>
+            <File>
+              <FileName>sem.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\kernel\sem.h</FilePath>
+            </File>
+            <File>
+              <FileName>time.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\kernel\time.c</FilePath>
+            </File>
+            <File>
+              <FileName>time.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\kernel\time.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -447,6 +467,16 @@
               <FileName>startup.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\cpu\startup.s</FilePath>
+            </File>
+            <File>
+              <FileName>cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\cpu\cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>cpu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\cpu\cpu.h</FilePath>
             </File>
           </Files>
         </Group>
