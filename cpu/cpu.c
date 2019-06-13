@@ -20,8 +20,19 @@ __asm void __startsystem(void)
 	LDR R7,[R3]
 	ORR R7,#0x7
 	STR R7,[R3]
-	MOV R7,#12000;1ms
+	MOV R7,#11999;1ms
 	STR R7,[R4]
 
 	BX LR
+}
+
+__asm void __schedule(void)
+{
+NVIC_ICSR EQU 0xE000ED04
+	IMPORT systime
+	LDR R0,=NVIC_ICSR
+	MOV R1,#0x10000000
+	STR R1,[R0]
+	BX LR
+	NOP
 }

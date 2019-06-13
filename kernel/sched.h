@@ -4,7 +4,8 @@
 #include "types.h"
 
 void initsystem(void);
-void addtasktolist(struct TaskTCB *,TaskFUNC,void *);
+int addtasktolist(struct TaskTCB *,int,TaskFUNC,void *);
 void startsystem(void);
+void schedule(void);
 
 #endif
